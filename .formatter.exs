@@ -1,4 +1,5 @@
 # Used by "mix format"
+# TODO generate this from the DSL builder
 locals_without_parens = [
   read: 1,
   read: 2,
@@ -15,6 +16,7 @@ locals_without_parens = [
   belongs_to: 3,
   has_one: 2,
   has_one: 3,
+  data_layer: 2,
   has_many: 2,
   has_many: 3,
   resource: 1,
@@ -23,8 +25,7 @@ locals_without_parens = [
   many_to_many: 3,
   resources: 1,
   max_page_size: 1,
-  default_page_size: 1,
-  primary_key?: 1
+  default_page_size: 1
 ]
 
 [

@@ -31,6 +31,8 @@ defmodule Ash.Dsl.Resource do
     has_many :read_actions, Ash.Dsl.ReadAction
     has_many :update_actions, Ash.Dsl.UpdateAction
     has_many :destroy_actions, Ash.Dsl.DestroyAction
+
+    has_one :data_layer, Ash.Dsl.DataLayerReference
   end
 
   def groups() do

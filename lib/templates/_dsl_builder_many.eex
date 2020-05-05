@@ -6,7 +6,11 @@ end
 
 defmodule <%= inspect mod_name %> do
   # _dsl_builder_many.eex: building relationship section
-  defmacro <%= builder_name %>(<%= Enum.join(upgrade_fields, ", ") %>, opts \\ []) do
+  <%= if upgrade_fields == [] do %>
+    defmacro <%= builder_name %>(opts__ \\ []) do
+  <% else %>
+    defmacro <%= builder_name %>(<%= Enum.join(upgrade_fields, ", ") %>, opts__ \\ []) do
+  <% end %>
     quote location: :keep do
       Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
@@ -14,7 +18,7 @@ defmodule <%= inspect mod_name %> do
         import <%= module %>, only: []
       <% end %>
       import <%= nested_mod_name %>
-      unquote(opts[:do])
+      unquote(opts__[:do])
       import <%= nested_mod_name %>, only: []
       <%= for module <- state.imports do %>
         import <%= module %>
@@ -26,11 +30,11 @@ defmodule <%= inspect mod_name %> do
       <% end %>
 
       attributes =
-        Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value}, attributes -> 
+        Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value}, attributes -> 
           Map.put(attributes, name, value)
         end)
 
-      for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+      for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
         attributes = Map.put(attributes, name, value)
       end
 

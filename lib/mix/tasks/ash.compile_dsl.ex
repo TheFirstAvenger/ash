@@ -52,17 +52,26 @@ defmodule Mix.Tasks.Ash.CompileDsl do
   @dsl_builder_group_template_path "lib/templates/_dsl_builder_group.eex"
 
   def build_relationship_group(relationships, nil, _groups, mod_prefix, state) do
-    Enum.map_join(
-      relationships,
-      "\n",
-      &build_relationship_group(
-        [&1],
-        &1.destination.name(),
-        [],
-        mod_prefix,
-        state
+    to_many_data =
+      relationships
+      |> Enum.filter(&(&1.cardinality == :many))
+      |> Enum.map_join(
+        "\n",
+        &build_relationship_group(
+          [&1],
+          &1.name(),
+          [],
+          mod_prefix,
+          state
+        )
       )
-    )
+
+    to_one_data =
+      relationships
+      |> Enum.filter(&(&1.cardinality == :one))
+      |> Enum.map_join("\n", &build_relationship_dsl(&1, mod_prefix, &1.name, state))
+
+    to_many_data <> "\n" <> to_one_data
   end
 
   def build_relationship_group(relationships, group_name, groups, mod_prefix, state) do
@@ -82,9 +91,23 @@ defmodule Mix.Tasks.Ash.CompileDsl do
   def build_relationship_dsl(%{cardinality: :one} = relationship, mod_prefix, builder_name, state) do
     mod_name = Module.concat(mod_prefix, Macro.camelize(Atom.to_string(relationship.name)))
 
+    upgrade_fields =
+      case Code.ensure_compiled(relationship.destination) do
+        {:module, _module} ->
+          if :erlang.function_exported(relationship.destination, :upgrade_fields, 0) do
+            relationship.destination.upgrade_fields()
+          else
+            []
+          end
+
+        _ ->
+          []
+      end
+
     @dsl_builder_one_template_path
     |> Path.expand()
     |> EEx.eval_file(
+      upgrade_fields: upgrade_fields,
       relationship: relationship,
       mod_name: mod_name,
       state: state,
@@ -100,6 +123,7 @@ defmodule Mix.Tasks.Ash.CompileDsl do
       ) do
     mod_name = Module.concat(mod_prefix, Macro.camelize(Atom.to_string(relationship.name)))
 
+    # This line is ensuring that the destination is compiled, so no need to ensure_compiled
     nested_mod_name = Module.concat(mod_name, Macro.camelize(Ash.type(relationship.destination)))
 
     upgrade_fields =

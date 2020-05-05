@@ -82,14 +82,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.DestroyActions do
     # _dsl_builder_many.eex: building relationship section
-    defmacro destroy(name, opts \\ []) do
+
+    defmacro destroy(name, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.DestroyActions.DestroyAction
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.DestroyActions.DestroyAction, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -99,12 +100,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :name, unquote(name))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -157,14 +158,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.UpdateActions do
     # _dsl_builder_many.eex: building relationship section
-    defmacro update(name, opts \\ []) do
+
+    defmacro update(name, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.UpdateActions.UpdateAction
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.UpdateActions.UpdateAction, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -174,12 +176,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :name, unquote(name))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -239,14 +241,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.ReadActions do
     # _dsl_builder_many.eex: building relationship section
-    defmacro read(name, opts \\ []) do
+
+    defmacro read(name, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.ReadActions.ReadAction
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.ReadActions.ReadAction, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -256,12 +259,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :name, unquote(name))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -314,14 +317,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.CreateActions do
     # _dsl_builder_many.eex: building relationship section
-    defmacro create(name, opts \\ []) do
+
+    defmacro create(name, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.CreateActions.CreateAction
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.CreateActions.CreateAction, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -331,12 +335,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :name, unquote(name))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -465,14 +469,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.Attributes do
     # _dsl_builder_many.eex: building relationship section
-    defmacro attribute(name, type, opts \\ []) do
+
+    defmacro attribute(name, type, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.Attributes.Attribute
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.Attributes.Attribute, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -484,12 +489,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :type, unquote(type))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -513,6 +518,78 @@ defmodule Ash.Dsl.Syntax.Resource do
       import Elixir.Ash.Dsl.Syntax.Resource
 
       import Ash.Dsl.Resource.Attributes, only: []
+    end
+  end
+
+  defmodule Ash.Dsl.Resource.DataLayer do
+    # _dsl_builder_one.eex: building relationship destination
+
+    # _dsl_builder_resource.eex: building resource attribute
+    defmacro resource_id(value) do
+      quote bind_quoted: [value: value], location: :keep do
+        @attributes {:resource_id, value}
+      end
+    end
+
+    # _dsl_builder_resource.eex: building resource attribute
+    defmacro opts(value) do
+      quote bind_quoted: [value: value], location: :keep do
+        @attributes {:opts, value}
+      end
+    end
+
+    # _dsl_builder_resource.eex: building resource attribute
+    defmacro module(value) do
+      quote bind_quoted: [value: value], location: :keep do
+        @attributes {:module, value}
+      end
+    end
+
+    # _dsl_builder_resource.eex: building resource attribute
+    defmacro id(value) do
+      quote bind_quoted: [value: value], location: :keep do
+        @attributes {:id, value}
+      end
+    end
+  end
+
+  defmacro data_layer(module, opts, opts__ \\ []) do
+    # _dsl_builder_one.eex: building relationship section
+    quote location: :keep do
+      Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+
+      import Ash.Dsl.Resource.DataLayer
+
+      import Elixir.Ash.Dsl.Syntax.Resource, only: []
+
+      unquote(opts__[:do])
+
+      import Elixir.Ash.Dsl.Syntax.Resource
+
+      import Ash.Dsl.Resource.DataLayer, only: []
+
+      attributes = Enum.into(@attributes, %{})
+
+      attributes = Map.put(attributes, :module, unquote(module))
+
+      attributes = Map.put(attributes, :opts, unquote(opts))
+
+      attributes =
+        Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                         attributes ->
+          Map.put(attributes, name, value)
+        end)
+
+      for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
+        attributes = Map.put(attributes, name, value)
+      end
+
+      attributes = Map.put(attributes, :resource_id, @resource_id)
+
+      {:ok, _} =
+        Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.DataLayerReference,
+          attributes: attributes
+        )
     end
   end
 
@@ -606,14 +683,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.ManyToManyRelationships do
     # _dsl_builder_many.eex: building relationship section
-    defmacro many_to_many(name, destination, opts \\ []) do
+
+    defmacro many_to_many(name, destination, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.ManyToManyRelationships.ManyToMany
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.ManyToManyRelationships.ManyToMany, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -625,12 +703,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :destination, unquote(destination))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -718,14 +796,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.BelongsToRelationships do
     # _dsl_builder_many.eex: building relationship section
-    defmacro belongs_to(name, destination, opts \\ []) do
+
+    defmacro belongs_to(name, destination, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.BelongsToRelationships.BelongsTo
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.BelongsToRelationships.BelongsTo, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -737,12 +816,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :destination, unquote(destination))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -823,14 +902,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.HasOneRelationships do
     # _dsl_builder_many.eex: building relationship section
-    defmacro has_one(name, destination, opts \\ []) do
+
+    defmacro has_one(name, destination, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.HasOneRelationships.HasOne
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.HasOneRelationships.HasOne, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -842,12 +922,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :destination, unquote(destination))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
@@ -928,14 +1008,15 @@ defmodule Ash.Dsl.Syntax.Resource do
 
   defmodule Ash.Dsl.Resource.HasManyRelationships do
     # _dsl_builder_many.eex: building relationship section
-    defmacro has_many(name, destination, opts \\ []) do
+
+    defmacro has_many(name, destination, opts__ \\ []) do
       quote location: :keep do
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
 
         import Elixir.Ash.Dsl.Resource.HasManyRelationships.HasMany
-        unquote(opts[:do])
+        unquote(opts__[:do])
         import Elixir.Ash.Dsl.Resource.HasManyRelationships.HasMany, only: []
 
         import Elixir.Ash.Dsl.Syntax.Resource
@@ -947,12 +1028,12 @@ defmodule Ash.Dsl.Syntax.Resource do
         attributes = Map.put(attributes, :destination, unquote(destination))
 
         attributes =
-          Enum.reduce(unquote(Keyword.delete(opts, :do)), attributes, fn {name, value},
-                                                                         attributes ->
+          Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
+                                                                           attributes ->
             Map.put(attributes, name, value)
           end)
 
-        for {name, value} <- unquote(Keyword.delete(opts, :do)) do
+        for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
           attributes = Map.put(attributes, name, value)
         end
 
