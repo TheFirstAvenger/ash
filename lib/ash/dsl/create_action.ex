@@ -17,6 +17,7 @@ defmodule Ash.Dsl.CreateAction do
   actions do
     create :default
     read :default
+    update :default
   end
 
   def upgrade_fields() do

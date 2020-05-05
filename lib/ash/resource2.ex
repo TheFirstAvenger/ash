@@ -19,6 +19,7 @@ defmodule Ash.Resource2 do
   def process_record(%dsl_resource{} = dsl_record) do
     dsl_record
     |> create_belongs_to_fields()
+    |> mark_primary_actions()
 
     {:ok, %{results: [record]}} =
       Ash.Dsl.StructureApi.read(dsl_resource, filter: [id: dsl_record.id])
@@ -44,6 +45,70 @@ defmodule Ash.Resource2 do
           }
         )
     end)
+
+    record
+  end
+
+  defp mark_primary_actions(%resource{} = record) do
+    for action_resource <- [
+          Ash.Dsl.CreateAction,
+          Ash.Dsl.UpdateAction,
+          Ash.Dsl.DestroyAction,
+          Ash.Dsl.ReadAction
+        ] do
+      case Ash.Dsl.StructureApi.read!(action_resource, filter: [resource_id: record.id]) do
+        %{results: []} ->
+          :ok
+
+        %{results: [%{primary?: true}]} ->
+          :ok
+
+        %{results: [%{primary?: false} = action]} ->
+          {:ok, _} = Ash.Dsl.StructureApi.update(action, attributes: %{primary?: true})
+
+        %{results: [first | _] = actions} ->
+          case Enum.count(actions, & &1.primary?) do
+            0 ->
+              # TODO: ash error these
+              raise "Must designate primary #{inspect(first.type)} action for #{inspect(resource)}"
+
+            1 ->
+              :ok
+
+            other ->
+              raise "Only one #{inspect(first.type)} action can be designated, found #{
+                      inspect(other)
+                    }"
+          end
+      end
+
+      record
+    end
+
+    #     actions =
+    #       all_actions
+    #       |> Enum.group_by(& &1.type)
+    #       |> Enum.flat_map(fn {type, actions} ->
+    #         case actions do
+    #           [action] ->
+    #             [%{action | primary?: true}]
+
+    #           actions ->
+    #             case Enum.count(actions, & &1.primary?) do
+    #               0 ->
+    #                 [{:error, {:no_primary, type}}]
+
+    #               1 ->
+    #                 actions
+
+    #               _ ->
+    #                 [{:error, {:duplicate_primaries, type}}]
+    #             end
+    #         end
+    #       end)
+
+    #     Enum.find(actions, fn action -> match?({:error, _}, action) end) || {:ok, actions}
+    #   end
   end
 
   def before_compile(dsl_record) do

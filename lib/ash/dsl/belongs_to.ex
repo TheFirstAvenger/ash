@@ -8,6 +8,7 @@ defmodule Ash.Dsl.BelongsTo do
   actions do
     create :default
     read :default
+    update :default
   end
 
   attributes do

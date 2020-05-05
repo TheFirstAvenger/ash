@@ -8,6 +8,7 @@ defmodule Ash.Dsl.ManyToMany do
   actions do
     create :default
     read :default
+    update :default
   end
 
   attributes do
