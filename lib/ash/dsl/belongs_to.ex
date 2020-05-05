@@ -17,10 +17,11 @@ defmodule Ash.Dsl.BelongsTo do
     # this value from configuration on the resource
     attribute :field_type, :atom, allow_nil?: false, default: {:constant, :uuid}
     # Need one arg defaults here as well, to derive destination_field id from this resource
-    attribute :destination_field, :atom, allow_nil?: false
+    attribute :destination_field, :atom, allow_nil?: false, default: {:constant, :id}
     # Need one arg defaults here as well to default to the primary key field name
-    attribute :source_field, :atom, allow_nil?: false, default: {:constant, :id}
+    attribute :source_field, :atom, allow_nil?: false
     attribute :reverse_relationship, :atom
+    attribute :define_field?, :boolean, allow_nil?: false, default: {:constant, true}
 
     # TODO: support array types
     attribute :write_rules, :term

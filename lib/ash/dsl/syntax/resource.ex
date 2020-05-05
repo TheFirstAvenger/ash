@@ -428,6 +428,13 @@ defmodule Ash.Dsl.Syntax.Resource do
     end
 
     # _dsl_builder_resource.eex: building resource attribute
+    defmacro generated?(value) do
+      quote bind_quoted: [value: value], location: :keep do
+        @attributes {:generated?, value}
+      end
+    end
+
+    # _dsl_builder_resource.eex: building resource attribute
     defmacro allow_nil?(value) do
       quote bind_quoted: [value: value], location: :keep do
         @attributes {:allow_nil?, value}
@@ -649,6 +656,13 @@ defmodule Ash.Dsl.Syntax.Resource do
     defmacro write_rules(value) do
       quote bind_quoted: [value: value], location: :keep do
         @attributes {:write_rules, value}
+      end
+    end
+
+    # _dsl_builder_resource.eex: building resource attribute
+    defmacro define_field?(value) do
+      quote bind_quoted: [value: value], location: :keep do
+        @attributes {:define_field?, value}
       end
     end
 

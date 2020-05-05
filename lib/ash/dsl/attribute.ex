@@ -9,6 +9,7 @@ defmodule Ash.Dsl.Attribute do
     attribute :name, :atom, allow_nil?: false
     attribute :type, :atom, allow_nil?: false
     attribute :allow_nil?, :boolean, allow_nil?: false, default: {:constant, true}
+    attribute :generated?, :boolean, allow_nil?: false, default: {:constant, false}
 
     attribute :primary_key?, :boolean,
       allow_nil?: false,
