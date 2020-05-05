@@ -9,4 +9,8 @@ defmodule Ash.Api2 do
       import Ash.Dsl.Syntax.Api
     end
   end
+
+  require Ash.Dsl.Helpers
+
+  Ash.Dsl.Helpers.def_global_accessors(Ash.Dsl.Api)
 end
