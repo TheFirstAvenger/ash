@@ -64,6 +64,8 @@ defmodule Ash.Dsl.Syntax.Api do
 
     defmacro resource(resource, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Api, only: []
@@ -94,6 +96,10 @@ defmodule Ash.Dsl.Syntax.Api do
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.ResourceReference,
             attributes: attributes
           )
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end

@@ -14,6 +14,13 @@ defmodule Ash.Dsl.Syntax.Resource do
   end
 
   # _dsl_builder_resource.eex: building resource attribute
+  defmacro data_layer(value) do
+    quote bind_quoted: [value: value], location: :keep do
+      @attributes {:data_layer, value}
+    end
+  end
+
+  # _dsl_builder_resource.eex: building resource attribute
   defmacro description(value) do
     quote bind_quoted: [value: value], location: :keep do
       @attributes {:description, value}
@@ -85,6 +92,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro destroy(name, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -113,6 +122,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.DestroyAction, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -161,6 +174,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro update(name, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -189,6 +204,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.UpdateAction, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -244,6 +263,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro read(name, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -272,6 +293,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.ReadAction, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -320,6 +345,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro create(name, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -348,6 +375,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.CreateAction, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -472,6 +503,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro attribute(name, type, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -502,6 +535,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.Attribute, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -518,78 +555,6 @@ defmodule Ash.Dsl.Syntax.Resource do
       import Elixir.Ash.Dsl.Syntax.Resource
 
       import Ash.Dsl.Resource.Attributes, only: []
-    end
-  end
-
-  defmodule Ash.Dsl.Resource.DataLayer do
-    # _dsl_builder_one.eex: building relationship destination
-
-    # _dsl_builder_resource.eex: building resource attribute
-    defmacro resource_id(value) do
-      quote bind_quoted: [value: value], location: :keep do
-        @attributes {:resource_id, value}
-      end
-    end
-
-    # _dsl_builder_resource.eex: building resource attribute
-    defmacro opts(value) do
-      quote bind_quoted: [value: value], location: :keep do
-        @attributes {:opts, value}
-      end
-    end
-
-    # _dsl_builder_resource.eex: building resource attribute
-    defmacro module(value) do
-      quote bind_quoted: [value: value], location: :keep do
-        @attributes {:module, value}
-      end
-    end
-
-    # _dsl_builder_resource.eex: building resource attribute
-    defmacro id(value) do
-      quote bind_quoted: [value: value], location: :keep do
-        @attributes {:id, value}
-      end
-    end
-  end
-
-  defmacro data_layer(module, opts, opts__ \\ []) do
-    # _dsl_builder_one.eex: building relationship section
-    quote location: :keep do
-      Module.register_attribute(__MODULE__, :attributes, accumulate: true)
-
-      import Ash.Dsl.Resource.DataLayer
-
-      import Elixir.Ash.Dsl.Syntax.Resource, only: []
-
-      unquote(opts__[:do])
-
-      import Elixir.Ash.Dsl.Syntax.Resource
-
-      import Ash.Dsl.Resource.DataLayer, only: []
-
-      attributes = Enum.into(@attributes, %{})
-
-      attributes = Map.put(attributes, :module, unquote(module))
-
-      attributes = Map.put(attributes, :opts, unquote(opts))
-
-      attributes =
-        Enum.reduce(unquote(Keyword.delete(opts__, :do)), attributes, fn {name, value},
-                                                                         attributes ->
-          Map.put(attributes, name, value)
-        end)
-
-      for {name, value} <- unquote(Keyword.delete(opts__, :do)) do
-        attributes = Map.put(attributes, name, value)
-      end
-
-      attributes = Map.put(attributes, :resource_id, @resource_id)
-
-      {:ok, _} =
-        Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.DataLayerReference,
-          attributes: attributes
-        )
     end
   end
 
@@ -686,6 +651,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro many_to_many(name, destination, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -716,6 +683,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.ManyToMany, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -799,6 +770,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro belongs_to(name, destination, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -829,6 +802,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.BelongsTo, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -905,6 +882,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro has_one(name, destination, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -935,6 +914,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.HasOne, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end
@@ -1011,6 +994,8 @@ defmodule Ash.Dsl.Syntax.Resource do
 
     defmacro has_many(name, destination, opts__ \\ []) do
       quote location: :keep do
+        old_value = Module.get_attribute(__MODULE__, :attributes) || []
+        Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
 
         import Elixir.Ash.Dsl.Syntax.Resource, only: []
@@ -1041,6 +1026,10 @@ defmodule Ash.Dsl.Syntax.Resource do
 
         {:ok, _} =
           Elixir.Ash.Dsl.StructureApi.create(Elixir.Ash.Dsl.HasMany, attributes: attributes)
+
+        Module.delete_attribute(__MODULE__, :attributes)
+        Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+        for value <- old_value, do: @attributes(value)
       end
     end
   end

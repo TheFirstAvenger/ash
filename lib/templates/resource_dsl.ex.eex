@@ -1,4 +1,0 @@
-<% import Mix.Tasks.Ash.CompileDsl %>
-defmodule <%= inspect mod_name %> do
-  <%= build_dsl(resource, add_imports(state, [mod_name])) %>
-end

@@ -173,27 +173,13 @@ defmodule Ash.Dsl.Helpers do
     end
   end
 
-  defmacro prepare(dsl_resource, _) do
-    quote bind_quoted: [dsl_resource: dsl_resource], location: :keep do
+  defmacro prepare(dsl_resource, _opts) do
+    quote bind_quoted: [dsl_resource: dsl_resource],
+          location: :keep do
       @dsl_resource dsl_resource
       @resource_id Ecto.UUID.generate()
 
       Module.register_attribute(__MODULE__, :attributes, accumulate: true)
-
-      for attribute <- Ash.attributes(dsl_resource) do
-        attribute_name = :"ash_#{attribute.name}"
-        Module.put_attribute(__MODULE__, attribute_name, nil)
-      end
-
-      for relationship <- Ash.relationships(dsl_resource) do
-        attribute_name = :"ash_#{relationship.name}"
-
-        if relationship.cardinality == :one do
-          Module.put_attribute(__MODULE__, attribute_name, nil)
-        else
-          Module.register_attribute(__MODULE__, attribute_name, accumulate: true)
-        end
-      end
     end
   end
 end

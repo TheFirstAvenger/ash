@@ -16,6 +16,7 @@ defmodule Ash.Dsl.Resource do
     attribute :name, :atom, allow_nil?: false, primary_key?: true
     attribute :identifier, :atom, allow_nil?: false
     attribute :description, :string, allow_nil?: false, default: {:constant, "No description"}
+    attribute :data_layer, :atom
     # TODO: validate these
     attribute :max_page_size, :integer
     attribute :default_page_size, :integer
@@ -31,8 +32,6 @@ defmodule Ash.Dsl.Resource do
     has_many :read_actions, Ash.Dsl.ReadAction
     has_many :update_actions, Ash.Dsl.UpdateAction
     has_many :destroy_actions, Ash.Dsl.DestroyAction
-
-    has_one :data_layer, Ash.Dsl.DataLayerReference
   end
 
   def groups() do

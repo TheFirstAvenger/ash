@@ -85,6 +85,10 @@ defmodule Ash.Type do
     def ecto_type(unquote(name)), do: unquote(builtin[:ecto_type])
   end
 
+  for {name, mod} <- @short_names do
+    def ecto_type(unquote(name)), do: ecto_type(unquote(mod))
+  end
+
   def ecto_type(type) do
     type.ecto_type()
   end

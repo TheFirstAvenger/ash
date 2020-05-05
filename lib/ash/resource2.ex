@@ -1,14 +1,15 @@
 defmodule Ash.Resource2 do
   defmacro __using__(opts) do
-    quote location: :keep do
+    quote bind_quoted: [opts: opts], location: :keep do
       require Ash.Dsl.Helpers
-      @using_opts unquote(opts)
+      @using_opts opts
+      Module.register_attribute(__MODULE__, :extensions, accumulate: true)
       require Ash.Resource2
       @add_before_compile Ash.Resource2
       @process_record Ash.Resource2
-      @before_compile Ash.Dsl.Helpers
       Ash.Dsl.Helpers.prepare(Ash.Dsl.Resource, @using_opts)
       import Ash.Dsl.Syntax.Resource
+      @before_compile Ash.Dsl.Helpers
     end
   end
 
@@ -49,7 +50,7 @@ defmodule Ash.Resource2 do
     record
   end
 
-  defp mark_primary_actions(%resource{} = record) do
+  defp mark_primary_actions(record) do
     for action_resource <- [
           Ash.Dsl.CreateAction,
           Ash.Dsl.UpdateAction,
@@ -69,16 +70,19 @@ defmodule Ash.Resource2 do
         %{results: [first | _] = actions} ->
           case Enum.count(actions, & &1.primary?) do
             0 ->
-              # TODO: ash error these
-              raise "Must designate primary #{inspect(first.type)} action for #{inspect(resource)}"
+              raise Ash.Error.ResourceDslError,
+                message:
+                  "Multiple actions of type #{first.type} defined, one must be designated as `primary?: true`",
+                path: [:actions, first.type]
 
             1 ->
               :ok
 
             other ->
-              raise "Only one #{inspect(first.type)} action can be designated, found #{
-                      inspect(other)
-                    }"
+              raise Ash.Error.ResourceDslError,
+                message:
+                  "#{other} actions of type #{first.type} configured as `primary?: true`, but only one action per type can be the primary",
+                path: [:actions, first.type]
           end
       end
 
