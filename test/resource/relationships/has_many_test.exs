@@ -2,7 +2,7 @@ defmodule Ash.Test.Resource.Relationshihps.HasManyTest do
   use ExUnit.Case, async: true
 
   defmacrop defposts(do: body) do
-    quote do
+    quote location: :keep do
       defmodule Post do
         use Ash.Resource, name: "posts", type: "post"
 

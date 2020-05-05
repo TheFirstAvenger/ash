@@ -458,6 +458,9 @@ defmodule Ash.Actions.Relationships do
     relationship_data = Map.put_new(relationship_data, :current, [])
 
     case relationship_data do
+      %{current: [], add: []} ->
+        changeset
+
       %{current: [], replace: [new]} ->
         changeset
         |> relate_belongs_to(relationship, new)

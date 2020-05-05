@@ -1,0 +1,26 @@
+<% import Mix.Tasks.Ash.CompileDsl %>
+defmodule <%= inspect mod_name %> do
+  # _dsl_builder_one.eex: building relationship destination
+  <%= build_dsl(relationship.destination, add_imports(state, [mod_name]), relationship.source) %>
+end
+
+defmacro <%= relationship.name %>(do: body) do
+# _dsl_builder_one.eex: building relationship section
+ quote location: :keep do
+    Module.register_attribute(__MODULE__, :attributes, accumulate: true)
+
+    import <%= inspect mod_name %>
+    <%= for module <- state.imports do %>
+      import <%= module %>, only: []
+    <% end %>
+    unquote(body)
+    <%= for module <- state.imports do %>
+      import <%= module %>
+    <% end %>
+    import <%= inspect mod_name %>, only: []
+
+    attrs = Keyword.put(@attributes, :<%= relationship.destination_field %>, @resource_id) |> Enum.into(%{})
+
+    {:ok, _} = Elixir.Ash.Dsl.StructureApi.create(Elixir.<%= inspect relationship.destination %>, attributes: attrs)
+ end
+end

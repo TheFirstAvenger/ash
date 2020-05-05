@@ -10,13 +10,18 @@ defmodule Ash.DataLayer.Ets do
   alias Ash.Filter.{Eq, In, And, Or, NotEq, NotIn}
 
   defmacro __using__(opts) do
-    quote bind_quoted: [opts: opts] do
+    quote bind_quoted: [opts: opts], location: :keep do
       @data_layer Ash.DataLayer.Ets
 
       @ets_private? Keyword.get(opts, :private?, false)
+      @table Keyword.get(opts, :table)
 
       def ets_private?() do
         @ets_private?
+      end
+
+      def table() do
+        @table || __MODULE__
       end
     end
   end
@@ -297,22 +302,36 @@ defmodule Ash.DataLayer.Ets do
     create(resource, changeset)
   end
 
-  defp wrap_or_create_table(resource) do
-    case ETS.Set.wrap_existing(resource) do
-      {:error, :table_not_found} ->
-        protection =
-          if private?(resource) do
-            :private
-          else
-            :public
-          end
+  defp wrap_or_create_table(resource, retry \\ true) do
+    table_name = resource.table()
 
-        ETS.Set.new(
-          name: resource,
-          protection: protection,
-          ordered: true,
-          read_concurrency: true
-        )
+    case ETS.Set.wrap_existing(table_name) do
+      {:error, :table_not_found} ->
+        try do
+          protection =
+            if private?(resource) do
+              :private
+            else
+              :public
+            end
+
+          case ETS.Set.new(
+                 name: resource,
+                 protection: protection,
+                 ordered: true,
+                 read_concurrency: true
+               ) do
+            {:error, :table_already_exists} -> wrap_or_create_table(resource)
+            {:ok, table} -> {:ok, table}
+          end
+        rescue
+          e in ArgumentError ->
+            if retry do
+              wrap_or_create_table(resource, false)
+            else
+              reraise e, __STACKTRACE__
+            end
+        end
 
       {:ok, table} ->
         {:ok, table}

@@ -30,6 +30,10 @@ defmodule Ash do
   @type attribute :: Ash.Attributes.Attribute.t()
   @type action :: Create.t() | Read.t() | Update.t() | Destroy.t()
 
+  def default_primary_key_type() do
+    Application.get_env(:ash, :default_primary_key_type) || :uid
+  end
+
   def ash_error?(value) do
     !!Ash.Error.impl_for(value)
   end
@@ -77,6 +81,12 @@ defmodule Ash do
 
   @spec primary_key(resource()) :: list(attribute)
   def primary_key(resource) do
+    # New implementation
+    # def primary_key(attributes) do
+    #   attributes
+    #   |> Enum.filter(& &1.primary_key?)
+    #   |> Enum.map(& &1.name)
+    # end
     resource.primary_key()
   end
 

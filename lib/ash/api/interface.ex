@@ -209,7 +209,7 @@ defmodule Ash.Api.Interface do
   @callback reload(record :: Ash.record()) :: {:ok, Ash.record()} | {:error, Ash.error()}
 
   defmacro __using__(_) do
-    quote do
+    quote location: :keep do
       @behaviour Ash.Api.Interface
 
       @impl true

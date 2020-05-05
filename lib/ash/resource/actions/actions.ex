@@ -19,7 +19,7 @@ defmodule Ash.Resource.Actions do
 
   @doc false
   defmacro actions(do: block) do
-    quote do
+    quote location: :keep do
       import Ash.Resource.Actions
       require Ash.Authorization.Check
 
@@ -42,7 +42,7 @@ defmodule Ash.Resource.Actions do
   ```
   """
   defmacro create(name, opts \\ []) do
-    quote bind_quoted: [name: name, opts: opts] do
+    quote bind_quoted: [name: name, opts: opts], location: :keep do
       unless is_atom(name) do
         raise Ash.Error.ResourceDslError,
           message: "action name must be an atom",
@@ -73,7 +73,7 @@ defmodule Ash.Resource.Actions do
   ```
   """
   defmacro read(name, opts \\ []) do
-    quote bind_quoted: [name: name, opts: opts] do
+    quote bind_quoted: [name: name, opts: opts], location: :keep do
       unless is_atom(name) do
         raise Ash.Error.ResourceDslError,
           message: "action name must be an atom",
@@ -104,7 +104,7 @@ defmodule Ash.Resource.Actions do
   ```
   """
   defmacro update(name, opts \\ []) do
-    quote bind_quoted: [name: name, opts: opts] do
+    quote bind_quoted: [name: name, opts: opts], location: :keep do
       unless is_atom(name) do
         raise Ash.Error.ResourceDslError,
           message: "action name must be an atom",
@@ -135,7 +135,7 @@ defmodule Ash.Resource.Actions do
   ```
   """
   defmacro destroy(name, opts \\ []) do
-    quote bind_quoted: [name: name, opts: opts] do
+    quote bind_quoted: [name: name, opts: opts], location: :keep do
       unless is_atom(name) do
         raise Ash.Error.ResourceDslError,
           message: "action name must be an atom",

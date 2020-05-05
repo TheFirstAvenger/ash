@@ -53,7 +53,7 @@ defmodule Ash.Api do
   be defined in your resources in order to call them through the Api.
   """
   defmacro __using__(opts) do
-    quote bind_quoted: [opts: opts] do
+    quote bind_quoted: [opts: opts], location: :keep do
       @before_compile Ash.Api
 
       opts =
@@ -90,7 +90,7 @@ defmodule Ash.Api do
   def using_schema(), do: @using_schema
 
   defmacro resources(resources) do
-    quote do
+    quote location: :keep do
       Enum.map(unquote(resources), fn resource ->
         case resource do
           {name, resource} ->

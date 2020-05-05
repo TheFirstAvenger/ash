@@ -15,12 +15,14 @@ defmodule Ash.Resource do
                             type: :string,
                             max_page_size: :integer,
                             default_page_size: :integer,
+                            description: :string,
                             primary_key: [
                               :boolean,
                               @primary_key_schema
                             ]
                           ],
                           describe: [
+                            description: "A human friendly description of the resource",
                             name:
                               "The name of the resource. This will typically be the pluralized form of the type",
                             type:
@@ -89,7 +91,7 @@ defmodule Ash.Resource do
   """
 
   defmacro __using__(opts) do
-    quote do
+    quote location: :keep do
       @before_compile Ash.Resource
       @behaviour Ash.Resource
 
@@ -108,7 +110,15 @@ defmodule Ash.Resource do
       Ash.Resource.define_resource_module_attributes(__MODULE__, opts)
       Ash.Resource.define_primary_key(__MODULE__, opts)
 
-      use Ash.Resource.DSL
+      import Ash.Resource.Actions, only: [actions: 1]
+      import Ash.Resource.Attributes, only: [attributes: 1]
+      import Ash.Resource.Relationships, only: [relationships: 1]
+
+      defmacro describe(description) do
+        quote location: :keep do
+          @description unquote(description)
+        end
+      end
     end
   end
 
@@ -163,7 +173,7 @@ defmodule Ash.Resource do
   end
 
   defmacro __before_compile__(env) do
-    quote do
+    quote location: :keep do
       case Ash.Resource.mark_primaries(@actions) do
         {:ok, actions} ->
           @sanitized_actions actions
@@ -241,6 +251,7 @@ defmodule Ash.Resource do
   @doc false
   def primary_key(attributes) do
     attributes
+    |> Kernel.||([])
     |> Enum.filter(& &1.primary_key?)
     |> Enum.map(& &1.name)
   end
@@ -249,6 +260,7 @@ defmodule Ash.Resource do
   def mark_primaries(all_actions) do
     actions =
       all_actions
+      |> Kernel.||([])
       |> Enum.group_by(& &1.type)
       |> Enum.flat_map(fn {type, actions} ->
         case actions do

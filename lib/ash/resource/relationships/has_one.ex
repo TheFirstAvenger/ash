@@ -9,8 +9,7 @@ defmodule Ash.Resource.Relationships.HasOne do
     :destination_field,
     :source_field,
     :reverse_relationship,
-    :write_rules,
-    :allow_orphans?
+    :write_rules
   ]
 
   @type t :: %__MODULE__{
@@ -23,7 +22,6 @@ defmodule Ash.Resource.Relationships.HasOne do
           destination: Ash.resource(),
           destination_field: atom,
           source_field: atom,
-          allow_orphans?: boolean,
           reverse_relationship: atom | nil
         }
 
@@ -32,14 +30,11 @@ defmodule Ash.Resource.Relationships.HasOne do
                   destination_field: :atom,
                   source_field: :atom,
                   reverse_relationship: :atom,
-                  write_rules: :keyword,
-                  allow_orphans?: :boolean
+                  write_rules: :keyword
                 ],
                 defaults: [
                   source_field: :id,
-                  write_rules: [],
-                  # TODO: When we add constraint expressions, we should validate this with that.
-                  allow_orphans?: true
+                  write_rules: []
                 ],
                 describe: [
                   reverse_relationship:
@@ -48,9 +43,6 @@ defmodule Ash.Resource.Relationships.HasOne do
                     "The field on the related resource that should match the `source_field` on this resource. Default: [resource.name]_id",
                   source_field:
                     "The field on this resource that should match the `destination_field` on the related resource.",
-                  # TODO: Explain this better
-                  allow_orphans:
-                    "Whether or not to allow orphaned records that would result in replaced relationships.",
                   write_rules: """
                   Steps applied on an relationship during create or update. If no steps are defined, authorization to change will fail.
                   If set to false, no steps are applied and any changes are allowed (assuming the action was authorized as a whole)

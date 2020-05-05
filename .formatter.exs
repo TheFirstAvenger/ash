@@ -17,6 +17,8 @@ locals_without_parens = [
   has_one: 3,
   has_many: 2,
   has_many: 3,
+  resource: 1,
+  resource: 2,
   many_to_many: 2,
   many_to_many: 3,
   resources: 1,

@@ -10,7 +10,7 @@ defmodule Ash.Resource.Relationships do
 
   @doc false
   defmacro relationships(do: block) do
-    quote do
+    quote location: :keep do
       import Ash.Resource.Relationships
       import Ash.Authorization.Check.BuiltInChecks
       import Ash.Authorization.Check.RelationshipBuiltInChecks
@@ -46,7 +46,8 @@ defmodule Ash.Resource.Relationships do
             relationship_name: relationship_name,
             destination: destination,
             opts: opts
-          ] do
+          ],
+          location: :keep do
       unless is_atom(relationship_name) do
         raise Ash.Error.ResourceDslError,
           message: "relationship_name must be an atom",
@@ -104,7 +105,8 @@ defmodule Ash.Resource.Relationships do
             relationship_name: relationship_name,
             destination: destination,
             config: config
-          ] do
+          ],
+          location: :keep do
       unless is_atom(relationship_name) do
         raise Ash.Error.ResourceDslError,
           message: "relationship_name must be an atom",
@@ -168,7 +170,8 @@ defmodule Ash.Resource.Relationships do
             relationship_name: relationship_name,
             destination: destination,
             opts: opts
-          ] do
+          ],
+          location: :keep do
       unless is_atom(relationship_name) do
         raise Ash.Error.ResourceDslError,
           message: "relationship_name must be an atom",
@@ -224,7 +227,7 @@ defmodule Ash.Resource.Relationships do
   ```
   """
   defmacro many_to_many(relationship_name, resource, config \\ []) do
-    quote do
+    quote location: :keep do
       many_to_many =
         Ash.Resource.Relationships.ManyToMany.new(
           __MODULE__,

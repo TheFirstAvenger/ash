@@ -1,0 +1,29 @@
+<% import Mix.Tasks.Ash.CompileDsl %>
+
+<%= for relationship <- relationships do %>
+  <% builder_name = groups[relationship.name][:name] || relationship.destination.type() %>
+  <%=  build_relationship_dsl(relationship, mod_name, builder_name, state) %>
+<% end %>
+
+<% nested_mod_names = Enum.map(relationships, &Module.concat(mod_name, Macro.camelize(Atom.to_string(&1.name)))) %>
+
+defmacro <%= group_name %>(do: body) do
+# _dsl_builder_group.eex: building group
+ quote location: :keep do
+    <%= for mod_name <- nested_mod_names do %>
+      import <%= inspect mod_name %>
+    <% end %>
+    <%= for module <- state.imports do %>
+      import <%= module %>, only: []
+    <% end %>
+
+    unquote(body)
+    <%= for module <- state.imports do %>
+      import <%= module %>
+    <% end %>
+
+    <%= for mod_name <- nested_mod_names do %>
+      import <%= inspect mod_name %>, only: []
+    <% end %>
+ end
+end

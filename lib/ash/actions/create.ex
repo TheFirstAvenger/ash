@@ -178,6 +178,17 @@ defmodule Ash.Actions.Create do
       |> Map.put(:__ash_relationships__, %{})
 
     changeset =
+      attributes
+      |> Map.keys()
+      |> Enum.reduce(changeset, fn key, changeset ->
+        if Ash.attribute(resource, key) do
+          changeset
+        else
+          Ecto.Changeset.add_error(changeset, key, "is unknown")
+        end
+      end)
+
+    changeset =
       Enum.reduce(
         unwritable_attributes,
         changeset,
@@ -191,8 +202,15 @@ defmodule Ash.Actions.Create do
     |> Enum.reject(&Map.get(&1, :default))
     |> Enum.reduce(changeset, fn attr, changeset ->
       case Ecto.Changeset.get_field(changeset, attr.name) do
-        nil -> Ecto.Changeset.add_error(changeset, attr.name, "must not be nil")
-        _value -> changeset
+        nil ->
+          if Keyword.has_key?(changeset.errors, attr.name) do
+            changeset
+          else
+            Ecto.Changeset.add_error(changeset, attr.name, "must not be nil")
+          end
+
+        _value ->
+          changeset
       end
     end)
   end

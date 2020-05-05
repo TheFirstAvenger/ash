@@ -25,10 +25,6 @@ defmodule Ash.Error do
 
     parent_error_module = @error_modules[error.class]
 
-    unless parent_error_module do
-      IO.inspect(error)
-    end
-
     parent_error_module.exception(errors: errors)
   end
 
@@ -60,13 +56,13 @@ defmodule Ash.Error do
   defp header(:unknown), do: "Unknown Error"
 
   defmacro __using__(_) do
-    quote do
+    quote location: :keep do
       import Ash.Error, only: [def_ash_error: 1, def_ash_error: 2]
     end
   end
 
   defmacro def_ash_error(fields, opts \\ []) do
-    quote do
+    quote location: :keep do
       defexception unquote(fields) ++ [:other_errors, path: [], class: unquote(opts)[:class]]
 
       @impl Exception

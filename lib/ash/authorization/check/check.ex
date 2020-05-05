@@ -22,7 +22,7 @@ defmodule Ash.Authorization.Check do
   end
 
   defmacro __using__(opts) do
-    quote do
+    quote location: :keep do
       @behaviour Ash.Authorization.Check
 
       @impl true
@@ -39,7 +39,7 @@ defmodule Ash.Authorization.Check do
   end
 
   defmacro import_default_checks(opts) do
-    quote do
+    quote location: :keep do
       import Ash.Authorization.Check.Static, only: [always: 0, never: 0]
       import Ash.Authorization.Check.RelatedToUserVia, only: [related_to_user_via: 1]
       import Ash.Authorization.Check.SettingAttribute, only: [setting_attribute: 2]
@@ -59,7 +59,7 @@ defmodule Ash.Authorization.Check do
   end
 
   defmacro unimport_checks() do
-    quote do
+    quote location: :keep do
       import Ash.Authorization.Check.Static, only: []
       import Ash.Authorization.Check.RelatedToUserVia, only: []
       import Ash.Authorization.Check.SettingAttribute, only: []

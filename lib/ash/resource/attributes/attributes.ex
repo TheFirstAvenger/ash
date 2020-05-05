@@ -8,7 +8,7 @@ defmodule Ash.Resource.Attributes do
 
   @doc false
   defmacro attributes(do: block) do
-    quote do
+    quote location: :keep do
       import Ash.Resource.Attributes
       import Ash.Authorization.Check.BuiltInChecks
       import Ash.Authorization.Check.AttributeBuiltInChecks
@@ -35,7 +35,7 @@ defmodule Ash.Resource.Attributes do
   ```
   """
   defmacro attribute(name, type, opts \\ []) do
-    quote bind_quoted: [type: type, name: name, opts: opts] do
+    quote bind_quoted: [type: type, name: name, opts: opts], location: :keep do
       unless is_atom(name) do
         raise Ash.Error.ResourceDslError,
           message: "Attribute name must be an atom, got: #{inspect(name)}",
@@ -113,7 +113,7 @@ defmodule Ash.Resource.Attributes do
             message: message
       end
 
-    quote bind_quoted: [opts: opts] do
+    quote bind_quoted: [opts: opts], location: :keep do
       inserted_at_name = opts[:inserted_at_field]
       updated_at_name = opts[:updated_at_field]
 

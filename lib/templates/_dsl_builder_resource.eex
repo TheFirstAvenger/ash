@@ -1,0 +1,25 @@
+<% import Mix.Tasks.Ash.CompileDsl %>
+<%= for attribute <- Ash.attributes(resource) do %>
+  <%= if attribute.writable? do %>
+    # _dsl_builder_resource.eex: building resource attribute
+    defmacro <%= attribute.name %>(value) do
+      quote bind_quoted: [value: value], location: :keep do
+        @attributes {:<%= attribute.name %>, value}
+      end
+    end
+    <% end %>
+<% end %>
+
+<% groups = if :erlang.function_exported(resource, :groups, 0), do: resource.groups(), else: [] %>
+
+<% 
+grouped_relationships =
+  resource
+  |> Ash.relationships()
+  |> Enum.reject(&(&1.destination == source))
+  |> Enum.group_by(&(groups[&1.name][:group]))
+ %>
+
+<%= for {group, relationships} <- grouped_relationships do %>
+  <%= build_relationship_group(relationships, group, groups, resource, state) %>
+<% end %>

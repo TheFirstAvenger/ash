@@ -30,7 +30,10 @@ defmodule Ash.Type do
     ]
   ]
 
-  @short_names []
+  @short_names [
+    atom: Ash.Type.Atom,
+    term: Ash.Type.Term
+  ]
 
   @builtin_names Keyword.keys(@builtins)
 
@@ -162,7 +165,7 @@ defmodule Ash.Type do
   # @callback equal?(term, term) :: boolean
 
   defmacro __using__(_) do
-    quote do
+    quote location: :keep do
       @behaviour Ash.Type
 
       parent = __MODULE__

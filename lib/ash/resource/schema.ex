@@ -7,7 +7,7 @@ defmodule Ash.Schema do
   """
 
   defmacro define_schema(name) do
-    quote do
+    quote location: :keep do
       use Ecto.Schema
       @primary_key false
 
@@ -21,7 +21,7 @@ defmodule Ash.Schema do
           )
         end
 
-        for relationship <- Enum.filter(@relationships, &(&1.type == :belongs_to)) do
+        for relationship <- Enum.filter(@relationships || [], &(&1.type == :belongs_to)) do
           belongs_to(relationship.name, relationship.destination,
             define_field: false,
             foreign_key: relationship.source_field,
@@ -29,21 +29,21 @@ defmodule Ash.Schema do
           )
         end
 
-        for relationship <- Enum.filter(@relationships, &(&1.type == :has_one)) do
+        for relationship <- Enum.filter(@relationships || [], &(&1.type == :has_one)) do
           has_one(relationship.name, relationship.destination,
             foreign_key: relationship.destination_field,
             references: relationship.source_field
           )
         end
 
-        for relationship <- Enum.filter(@relationships, &(&1.type == :has_many)) do
+        for relationship <- Enum.filter(@relationships || [], &(&1.type == :has_many)) do
           has_many(relationship.name, relationship.destination,
             foreign_key: relationship.destination_field,
             references: relationship.source_field
           )
         end
 
-        for relationship <- Enum.filter(@relationships, &(&1.type == :many_to_many)) do
+        for relationship <- Enum.filter(@relationships || [], &(&1.type == :many_to_many)) do
           many_to_many(relationship.name, relationship.destination,
             join_through: relationship.through,
             join_keys: [

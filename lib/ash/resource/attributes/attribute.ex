@@ -10,6 +10,7 @@ defmodule Ash.Resource.Attributes.Attribute do
     :writable?,
     :default,
     :update_default,
+    :description,
     :write_rules
   ]
 
@@ -30,6 +31,7 @@ defmodule Ash.Resource.Attributes.Attribute do
               write_rules: [{:const, false}, :keyword],
               generated?: :boolean,
               writable?: :boolean,
+              description: :string,
               update_default: [
                 {:function, 0},
                 {:function, 1},
@@ -43,6 +45,7 @@ defmodule Ash.Resource.Attributes.Attribute do
               ]
             ],
             defaults: [
+              description: "No description",
               primary_key?: false,
               generated?: false,
               allow_nil?: true,
@@ -50,6 +53,7 @@ defmodule Ash.Resource.Attributes.Attribute do
               write_rules: []
             ],
             describe: [
+              description: "A human friendly description of the attribute.",
               allow_nil?: """
               Whether or not to allow `null` values. Ash can perform optimizations with this information, so if you do not
               expect any null values, make sure to set this switch.
@@ -100,6 +104,7 @@ defmodule Ash.Resource.Attributes.Attribute do
          type: type,
          generated?: opts[:generated?],
          write_rules: write_rules,
+         description: opts[:description],
          writable?: opts[:writable?],
          allow_nil?: opts[:allow_nil?],
          primary_key?: opts[:primary_key?],
