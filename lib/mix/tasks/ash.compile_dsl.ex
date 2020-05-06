@@ -6,13 +6,19 @@ defmodule Mix.Tasks.Ash.CompileDsl do
 
   def run(_) do
     api_contents =
-      Ash.Dsl.Api
-      |> Ash.Dsl.Builder.build_resource(Ash.Dsl.Syntax.Api)
+      Ash.Structure.Api
+      |> Ash.Structure.Builder.build_resource(
+        Ash.Structure.Syntax.Api,
+        Ash.Structure.StructureApi
+      )
       |> puts()
 
     resource_contents =
-      Ash.Dsl.Resource
-      |> Ash.Dsl.Builder.build_resource(Ash.Dsl.Syntax.Resource)
+      Ash.Structure.Resource
+      |> Ash.Structure.Builder.build_resource(
+        Ash.Structure.Syntax.Resource,
+        Ash.Structure.StructureApi
+      )
       |> puts()
 
     @api_destination_path

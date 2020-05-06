@@ -1,6 +1,6 @@
-defmodule Ash.Dsl.Builder do
+defmodule Ash.Structure.Builder do
   @top_level_dsl ~S"""
-  <% import Ash.Dsl.Builder %>
+  <% import Ash.Structure.Builder %>
   defmodule <%= inspect mod_name %> do
     <%= build_dsl(resource, add_imports(state, [mod_name])) %>
   end
@@ -11,7 +11,7 @@ defmodule Ash.Dsl.Builder do
   """
 
   @resource_dsl ~S"""
-  <% import Ash.Dsl.Builder %>
+  <% import Ash.Structure.Builder %>
   <%= for attribute <- Ash.attributes(resource) do %>
     <%= if attribute.writable? do %>
       # _dsl_builder_resource.eex: building resource attribute
@@ -39,7 +39,7 @@ defmodule Ash.Dsl.Builder do
   """
 
   @relationship_one_dsl ~S"""
-  <% import Ash.Dsl.Builder %>
+  <% import Ash.Structure.Builder %>
   defmodule <%= inspect mod_name %> do
     # _dsl_builder_one.eex: building relationship destination
     <%= build_dsl(relationship.destination, add_imports(state, [mod_name]), relationship.source) %>
@@ -82,7 +82,7 @@ defmodule Ash.Dsl.Builder do
 
     attributes = Map.put(attributes, :<%= relationship.destination_field %>, @resource_id)
 
-    {:ok, _} = Elixir.Ash.Dsl.StructureApi.create(Elixir.<%= inspect relationship.destination %>, attributes: attributes)
+    {:ok, _} = <%= inspect api %>.create(Elixir.<%= inspect relationship.destination %>, attributes: attributes)
 
     Module.delete_attribute(__MODULE__, :attributes)
     Module.register_attribute(__MODULE__, :attributes, accumulate: true)
@@ -91,7 +91,7 @@ defmodule Ash.Dsl.Builder do
   """
 
   @relationship_many_dsl ~S"""
-  <% import Ash.Dsl.Builder %>
+  <% import Ash.Structure.Builder %>
   defmodule <%= nested_mod_name %> do
     # _dsl_builder_many.eex: building relationship destination
     <%= build_dsl(relationship.destination, add_imports(state, [mod_name, nested_mod_name]), relationship.source) %>
@@ -135,7 +135,7 @@ defmodule Ash.Dsl.Builder do
 
         attributes = Map.put(attributes, :<%= relationship.destination_field %>, @resource_id)
 
-        {:ok, _} = Elixir.Ash.Dsl.StructureApi.create(Elixir.<%= inspect relationship.destination %>, attributes: attributes)
+        {:ok, _} = <%= inspect api %>.create(Elixir.<%= inspect relationship.destination %>, attributes: attributes)
 
         Module.delete_attribute(__MODULE__, :attributes)
         Module.register_attribute(__MODULE__, :attributes, accumulate: true)
@@ -146,7 +146,7 @@ defmodule Ash.Dsl.Builder do
   """
 
   @group_dsl ~S"""
-  <% import Ash.Dsl.Builder %>
+  <% import Ash.Structure.Builder %>
 
   <%= for relationship <- relationships do %>
     <% builder_name = groups[relationship.name][:name] || relationship.destination.type() %>
@@ -182,32 +182,34 @@ defmodule Ash.Dsl.Builder do
     imports: []
   }
 
-  defmacro build(resource, mod_name) do
+  defmacro build(resource, mod_name, api) do
     quote do
       unquote(resource)
-      |> Ash.Dsl.Builder.build_resource(unquote(mod_name), true)
+      |> Ash.Structure.Builder.build_resource(unquote(api), unquote(mod_name), true)
       |> Code.eval_string([], __ENV__)
     end
   end
 
-  def build_resource(resource, mod_name, import? \\ false) do
+  def build_resource(api, resource, mod_name, import? \\ false) do
     EEx.eval_string(
       @top_level_dsl,
       mod_name: mod_name,
       resource: resource,
       state: @default_state,
-      import?: import?
+      import?: import?,
+      api: api
     )
     |> Code.format_string!()
   end
 
-  def build_relationship_group(relationships, nil, _groups, mod_prefix, state) do
+  def build_relationship_group(api, relationships, nil, _groups, mod_prefix, state) do
     to_many_data =
       relationships
       |> Enum.filter(&(&1.cardinality == :many))
       |> Enum.map_join(
         "\n",
         &build_relationship_group(
+          api,
           [&1],
           &1.name(),
           [],
@@ -219,15 +221,16 @@ defmodule Ash.Dsl.Builder do
     to_one_data =
       relationships
       |> Enum.filter(&(&1.cardinality == :one))
-      |> Enum.map_join("\n", &build_relationship_dsl(&1, mod_prefix, &1.name, state))
+      |> Enum.map_join("\n", &build_relationship_dsl(api, &1, mod_prefix, &1.name, state))
 
     to_many_data <> "\n" <> to_one_data
   end
 
-  def build_relationship_group(relationships, group_name, groups, mod_prefix, state) do
+  def build_relationship_group(api, relationships, group_name, groups, mod_prefix, state) do
     # mod_name = Module.concat(mod_prefix, Macro.camelize(to_string(group_name)))
 
     EEx.eval_string(@group_dsl,
+      api: api,
       relationships: relationships,
       groups: groups,
       group_name: group_name,
@@ -236,7 +239,13 @@ defmodule Ash.Dsl.Builder do
     )
   end
 
-  def build_relationship_dsl(%{cardinality: :one} = relationship, mod_prefix, builder_name, state) do
+  def build_relationship_dsl(
+        api,
+        %{cardinality: :one} = relationship,
+        mod_prefix,
+        builder_name,
+        state
+      ) do
     mod_name = Module.concat(mod_prefix, Macro.camelize(Atom.to_string(relationship.name)))
 
     upgrade_fields =
@@ -253,6 +262,7 @@ defmodule Ash.Dsl.Builder do
       end
 
     EEx.eval_string(@relationship_one_dsl,
+      api: api,
       upgrade_fields: upgrade_fields,
       relationship: relationship,
       mod_name: mod_name,
@@ -262,6 +272,7 @@ defmodule Ash.Dsl.Builder do
   end
 
   def build_relationship_dsl(
+        api,
         %{cardinality: :many} = relationship,
         mod_prefix,
         builder_name,
@@ -281,6 +292,7 @@ defmodule Ash.Dsl.Builder do
 
     EEx.eval_string(
       @relationship_many_dsl,
+      api: api,
       relationship: relationship,
       mod_name: mod_name,
       nested_mod_name: nested_mod_name,
@@ -290,8 +302,8 @@ defmodule Ash.Dsl.Builder do
     )
   end
 
-  def build_dsl(resource, state, source \\ nil) do
-    EEx.eval_string(@resource_dsl, resource: resource, state: state, source: source)
+  def build_dsl(api, resource, state, source \\ nil) do
+    EEx.eval_string(@resource_dsl, api: api, resource: resource, state: state, source: source)
   end
 
   def add_imports(state, imports) do

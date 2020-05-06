@@ -303,7 +303,7 @@ defmodule Ash.Api.Interface do
   @spec get(Ash.api(), Ash.resource(), term(), Ash.params()) ::
           {:ok, Ash.record()} | {:error, Ash.error()}
   def get(api, resource, filter, params) do
-    with {:resource, {:ok, resource}} <- {:resource, api.get_resource(resource)},
+    with {:resource, {:ok, resource}} <- {:resource, get_resource(api, resource)},
          {:pkey, primary_key} when primary_key != [] <- {:pkey, Ash.primary_key(resource)} do
       params =
         Keyword.update(params, :authorization, false, fn authorization ->
@@ -375,7 +375,7 @@ defmodule Ash.Api.Interface do
   def read(api, resource, params \\ []) do
     params = add_default_page_size(api, params)
 
-    case api.get_resource(resource) do
+    case get_resource(api, resource) do
       {:ok, resource} ->
         case Keyword.get(params, :action) || Ash.primary_action(resource, :read) do
           nil ->
@@ -403,7 +403,7 @@ defmodule Ash.Api.Interface do
   @spec create(Ash.api(), Ash.resource(), Ash.create_params()) ::
           {:ok, Ash.resource()} | {:error, Ash.error()}
   def create(api, resource, params) do
-    case api.get_resource(resource) do
+    case get_resource(api, resource) do
       {:ok, resource} ->
         case Keyword.get(params, :action) || Ash.primary_action(resource, :create) do
           nil ->
@@ -430,7 +430,7 @@ defmodule Ash.Api.Interface do
   @spec update(Ash.api(), Ash.record(), Ash.update_params()) ::
           {:ok, Ash.resource()} | {:error, Ash.error()}
   def update(api, %resource{} = record, params) do
-    case api.get_resource(resource) do
+    case get_resource(api, resource) do
       {:ok, resource} ->
         case Keyword.get(params, :action) || Ash.primary_action(resource, :update) do
           nil ->
@@ -457,7 +457,7 @@ defmodule Ash.Api.Interface do
   @spec destroy(Ash.api(), Ash.record(), Ash.delete_params()) ::
           {:ok, Ash.resource()} | {:error, Ash.error()}
   def destroy(api, %resource{} = record, params) do
-    case api.get_resource(resource) do
+    case get_resource(api, resource) do
       {:ok, resource} ->
         case Keyword.get(params, :action) || Ash.primary_action(resource, :destroy) do
           nil ->
@@ -489,6 +489,15 @@ defmodule Ash.Api.Interface do
           _ ->
             Keyword.update(params, :page, [limit: default], &Keyword.put(&1, :limit, default))
         end
+    end
+  end
+
+  defp get_resource(api, resource) do
+    case Enum.find(api.resources, fn resource_reference ->
+           resource_reference.resource == resource || resource_reference.short_name == resource
+         end) do
+      nil -> :error
+      resource -> {:ok, resource.resource}
     end
   end
 end

@@ -1,3 +1,13 @@
+# defmodule Ash.DataLayer.Ets.DslExtension do
+#   use Elixir.Ash.Resource,
+#     name: :ash_postgres,
+#     identifier: :ash_postgres
+
+#   attributes do
+#     attribute :private?, :boolean, allow_nil?: false, default: {:constant, false}
+#   end
+# end
+
 defmodule Ash.DataLayer.Ets do
   @moduledoc """
   An ETS (Erlang Term Storage) backed Ash Datalayer, for testing.
@@ -9,25 +19,19 @@ defmodule Ash.DataLayer.Ets do
 
   alias Ash.Filter.{Eq, In, And, Or, NotEq, NotIn}
 
-  defmacro __using__(opts) do
-    quote bind_quoted: [opts: opts], location: :keep do
-      @data_layer Ash.DataLayer.Ets
+  # Because this is used by the bootstrap resources, we can't use the fancy stuff :(
+  defmacro __using__(_opts) do
+    quote location: :keep do
+      # require Ash.Structure.Builder
+      # Ash.Structure.Builder.build(Ash.DataLayer.Ets.DslExtension, AshPostgres.Syntax)
+      # Ash.Structure.Helpers.def_accessors(Ash.DataLayer.Ets.DslExtension)
 
-      @ets_private? Keyword.get(opts, :private?, false)
-      @table Keyword.get(opts, :table)
+      @extensions unquote(__MODULE__)
 
-      def ets_private?() do
-        @ets_private?
-      end
-
-      def table() do
-        @table || __MODULE__
+      def ets_private? do
+        false
       end
     end
-  end
-
-  def private?(resource) do
-    resource.ets_private?()
   end
 
   defmodule Query do
@@ -309,7 +313,7 @@ defmodule Ash.DataLayer.Ets do
       {:error, :table_not_found} ->
         try do
           protection =
-            if private?(resource) do
+            if resource.ets_private? do
               :private
             else
               :public
