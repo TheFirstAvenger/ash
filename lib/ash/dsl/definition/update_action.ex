@@ -1,5 +1,6 @@
-defmodule Ash.Structure.UpdateAction do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3, attr: 2]
+defmodule Ash.Dsl.Definition.UpdateAction do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :update_actions
   @identifier :update_action
@@ -13,6 +14,5 @@ defmodule Ash.Structure.UpdateAction do
   ]
 
   @upgrade_fields [:name]
-
-  use Ash.Structure.Bootstrap.Resource
+  @builder_name :update
 end

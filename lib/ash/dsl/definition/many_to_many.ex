@@ -1,5 +1,6 @@
-defmodule Ash.Structure.ManyToMany do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3]
+defmodule Ash.Dsl.Definition.ManyToMany do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :many_to_manies
   @identifier :many_to_many
@@ -23,9 +24,6 @@ defmodule Ash.Structure.ManyToMany do
     attr(:resource_id, :uuid)
   ]
 
-  def upgrade_fields() do
-    [:name, :destination]
-  end
-
-  use Ash.Structure.Bootstrap.Resource
+  @upgrade_fields [:name, :destination]
+  @builder_name :many_to_many
 end

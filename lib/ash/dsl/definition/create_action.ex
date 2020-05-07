@@ -1,6 +1,6 @@
-defmodule Ash.Structure.CreateAction do
-  use Ash.Structure.Bootstrap.Resource
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3]
+defmodule Ash.Dsl.Definition.CreateAction do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :create_actions
   @identifier :create_action
@@ -14,4 +14,5 @@ defmodule Ash.Structure.CreateAction do
   ]
 
   @name [:name]
+  @builder_name :create
 end

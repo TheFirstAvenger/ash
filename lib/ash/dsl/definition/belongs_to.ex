@@ -1,5 +1,6 @@
-defmodule Ash.Structure.BelongsTo do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3, attr: 2]
+defmodule Ash.Dsl.Definition.BelongsTo do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :belongs_tos
   @identifier :belongs_to
@@ -21,5 +22,5 @@ defmodule Ash.Structure.BelongsTo do
   ]
 
   @upgrade_fields [:name, :destination]
-  use Ash.Structure.Bootstrap.Resource
+  @builder_name :belongs_to
 end

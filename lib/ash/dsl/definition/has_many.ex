@@ -1,8 +1,9 @@
-defmodule Ash.Structure.HasMany do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3, attr: 2]
+defmodule Ash.Dsl.Definition.HasMany do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :has_manies
-  @type :has_many
+  @identifier :has_many
 
   @attributes [
     attr(:name, :atom, allow_nil?: false),
@@ -21,6 +22,5 @@ defmodule Ash.Structure.HasMany do
   ]
 
   @upgrade_fields [:name, :destination]
-
-  use Ash.Structure.Bootstrap.Resource
+  @builder_name :has_many
 end

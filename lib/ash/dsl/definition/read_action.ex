@@ -1,5 +1,6 @@
-defmodule Ash.Structure.ReadAction do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3]
+defmodule Ash.Dsl.Definition.ReadAction do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :read_actions
   @identifier :read_action
@@ -14,6 +15,5 @@ defmodule Ash.Structure.ReadAction do
   ]
 
   @upgrade_fields [:name]
-
-  use Ash.Structure.Bootstrap.Resource
+  @builder_name :read
 end

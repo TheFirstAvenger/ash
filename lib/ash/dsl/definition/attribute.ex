@@ -1,5 +1,6 @@
-defmodule Ash.Structure.Attribute do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 2, attr: 3]
+defmodule Ash.Dsl.Definition.Attribute do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 2, attr: 3]
 
   @name :apis
   @identifier :api
@@ -19,6 +20,5 @@ defmodule Ash.Structure.Attribute do
   ]
 
   @upgrade_fields [:name, :type]
-
-  use Ash.Structure.Bootstrap.Resource
+  @builder_name :attribute
 end

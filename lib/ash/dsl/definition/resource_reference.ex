@@ -1,5 +1,6 @@
-defmodule Ash.Structure.ResourceReference do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3, attr: 2, has_many: 2]
+defmodule Ash.Dsl.Definition.ResourceReference do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :resource_references
   @identifier :resource_reference
@@ -11,5 +12,5 @@ defmodule Ash.Structure.ResourceReference do
 
   @upgrade_fields [:resource]
 
-  use Ash.Structure.Bootstrap.Resource
+  @builder_name :resource
 end

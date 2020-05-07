@@ -1,7 +1,7 @@
-defmodule Ash.Structure.Interface do
+defmodule Ash.Dsl.Definition.Interface do
   defmacro def_global_accessors(dsl_resource) do
     quote bind_quoted: [dsl_resource: dsl_resource], location: :keep do
-      for attribute <- dsl_resource.ash_attributes() -- [:id] do
+      for attribute <- dsl_resource.attributes() -- [:id] do
         def unquote(attribute.name)(resource) do
           apply(resource, unquote(attribute.name), [])
         end
@@ -40,7 +40,7 @@ defmodule Ash.Structure.Interface do
 
   defmacro def_accessors(record) do
     quote bind_quoted: [record: record], location: :keep do
-      for attribute <- @dsl_resource.ash_attributes() -- [:id] do
+      for attribute <- @dsl_resource.attributes() -- [:id] do
         value = Map.get(record, attribute.name)
 
         def unquote(attribute.name)() do

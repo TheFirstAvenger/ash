@@ -1,5 +1,19 @@
-defmodule Ash.Structure.Bootstrap.Resource do
+defmodule Ash.Dsl.Definition.Bootstrap.Resource do
   defmacro __using__(_) do
+    quote do
+      @before_compile unquote(__MODULE__)
+      @after_compile Ash.Dsl.Definition.Bootstrap.SanitizeResource
+
+      @description "No description"
+      @attributes []
+      @relationships []
+      @groups []
+      @upgrade_fields []
+      @builder_name nil
+    end
+  end
+
+  defmacro __before_compile__(_env) do
     quote do
       def name(), do: @name
       def identifier(), do: @identifier
@@ -12,22 +26,19 @@ defmodule Ash.Structure.Bootstrap.Resource do
         100
       end
 
-      defp get_attr(attr, default) do
-        Module.get_attribute(__MODULE__, attr, default)
-      end
-
       def data_layer(), do: Ash.DataLayer.Ets
 
       def description() do
-        get_attr(:description, "No description")
+        @description
       end
 
       def attributes() do
-        get_attr(:attributes, [])
+        @attributes
       end
 
       def relationships() do
-        get_attr(:relationships, [])
+        @relationships
+        |> Enum.map(&Map.put(&1, :source_field, :id))
       end
 
       def actions() do
@@ -57,8 +68,9 @@ defmodule Ash.Structure.Bootstrap.Resource do
       end
 
       # DSL Specific
-      def groups(), do: get_attr(:groups, [])
-      def upgrade_fields(), do: get_attr(:upgrade_fields, [])
+      def groups(), do: @groups
+      def upgrade_fields(), do: @upgrade_fields
+      def builder_name, do: @builder_name
     end
   end
 
@@ -79,9 +91,10 @@ defmodule Ash.Structure.Bootstrap.Resource do
     end
   end
 
-  defmacro has_many(name, destination) do
-    quote bind_quoted: [name: name, destination: destination] do
+  defmacro has_many(name, destination, keys \\ []) do
+    quote bind_quoted: [name: name, destination: destination, keys: keys] do
       %{name: name, destination: destination, type: :has_many, cardinality: :has_many}
+      |> Map.merge(Enum.into(keys, %{}))
     end
   end
 end

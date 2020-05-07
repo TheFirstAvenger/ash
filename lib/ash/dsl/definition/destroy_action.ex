@@ -1,5 +1,6 @@
-defmodule Ash.Structure.DestroyAction do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3, attr: 2]
+defmodule Ash.Dsl.Definition.DestroyAction do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :destroy_actions
   @identifier :destroy_action
@@ -13,6 +14,5 @@ defmodule Ash.Structure.DestroyAction do
   ]
 
   @upgrade_fields [:name]
-
-  use Ash.Structure.Bootstrap.Resource
+  @builder_name :destroy
 end

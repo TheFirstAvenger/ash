@@ -22,9 +22,9 @@ defmodule Ash.DataLayer.Ets do
   # Because this is used by the bootstrap resources, we can't use the fancy stuff :(
   defmacro __using__(_opts) do
     quote location: :keep do
-      # require Ash.Structure.Builder
-      # Ash.Structure.Builder.build(Ash.DataLayer.Ets.DslExtension, AshPostgres.Syntax)
-      # Ash.Structure.Helpers.def_accessors(Ash.DataLayer.Ets.DslExtension)
+      # require Ash.Dsl.Definition.Builder
+      # Ash.Dsl.Definition.Builder.build(Ash.DataLayer.Ets.DslExtension, AshPostgres.Syntax)
+      # Ash.Dsl.Definition.Helpers.def_accessors(Ash.DataLayer.Ets.DslExtension)
 
       @extensions unquote(__MODULE__)
 

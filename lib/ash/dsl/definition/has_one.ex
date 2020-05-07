@@ -1,5 +1,6 @@
-defmodule Ash.Structure.HasOne do
-  import Ash.Structure.Bootstrap.Resource, only: [attr: 3]
+defmodule Ash.Dsl.Definition.HasOne do
+  use Ash.Dsl.Definition.Bootstrap.Resource
+  import Ash.Dsl.Definition.Bootstrap.Resource, only: [attr: 3, attr: 2]
 
   @name :has_ones
   @identifier :has_one
@@ -20,7 +21,6 @@ defmodule Ash.Structure.HasOne do
     attr(:resource_id, :uuid)
   ]
 
-  @attributes [:name, :destination]
-
-  use Ash.Structure.Bootstrap.Resource
+  @upgrade_fields [:name, :destination]
+  @builder_name :has_one
 end
