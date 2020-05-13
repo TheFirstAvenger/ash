@@ -117,20 +117,16 @@ defmodule Ash.Authorization.Report do
 
       explained =
         Enum.map_join(clauses, "\n", fn {clause, value, count_of_clauses} ->
-          cond do
-            clause.request_id ->
-              inspect(clause.request_id) <>
-                ": " <>
-                clause.check_module.describe(clause.check_opts) <> " " <> status_to_mark(value)
+          clause_descriptor =
+            cond do
+            clause.request_id -> inspect(clause.request_id, label: "here") <> ": "
 
-            count_of_clauses == 0 ->
-              clause.check_module.describe(clause.check_opts) <> " " <> status_to_mark(value)
+            count_of_clauses == 0 -> ""
 
-            true ->
-              inspect(clause.filter) <>
-                ": " <>
-                clause.check_module.describe(clause.check_opts) <> " " <> status_to_mark(value)
+            true -> inspect(clause.filter) <> ": "
           end
+
+          clause_descriptor <> pretty_print_clause_result(clause.check_module.describe(clause.check_opts), value)
         end)
 
       if resource do
@@ -229,4 +225,10 @@ defmodule Ash.Authorization.Report do
   defp status_to_mark(:unknowable), do: Symbols.question_mark()
   defp status_to_mark(:irrelevant), do: Symbols.stop_mark()
   defp status_to_mark(nil), do: Symbols.dash_mark()
+
+  defp pretty_print_clause_result(text, true), do: Symbols.code(10, text)
+  defp pretty_print_clause_result(text, false), do: Symbols.code(9, text)
+  defp pretty_print_clause_result(text, :unknowable), do: Symbols.code(11, text)
+  defp pretty_print_clause_result(text, :irrelevant), do: Symbols.code(1, text)
+  defp pretty_print_clause_result(text, nil), do: Symbols.code(8, text)
 end
