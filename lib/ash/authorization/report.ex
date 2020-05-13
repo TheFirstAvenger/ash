@@ -1,6 +1,7 @@
 defmodule Ash.Authorization.Report do
   alias Ash.Authorization.Clause
   alias Ash.Engine.Request
+  alias Ash.Inspect.Symbols
 
   defstruct [
     :scenarios,
@@ -140,12 +141,6 @@ defmodule Ash.Authorization.Report do
     end)
   end
 
-  defp status_to_mark(true), do: "✓"
-  defp status_to_mark(false), do: "✗"
-  defp status_to_mark(:unknowable), do: "?"
-  defp status_to_mark(:irrelevant), do: "⊘"
-  defp status_to_mark(nil), do: "-"
-
   defp indent(string) do
     string
     |> String.split("\n")
@@ -213,19 +208,25 @@ defmodule Ash.Authorization.Report do
     contents
   end
 
-  defp step_to_mark(:authorize_if, true), do: "✓"
-  defp step_to_mark(:authorize_if, false), do: "↓"
-  defp step_to_mark(:authorize_if, _), do: "↓"
+  defp step_to_mark(:authorize_if, true), do: Symbols.check_mark()
+  defp step_to_mark(:authorize_if, false), do: Symbols.defer_mark()
+  defp step_to_mark(:authorize_if, _), do: Symbols.defer_mark()
 
-  defp step_to_mark(:forbid_if, true), do: "✗"
-  defp step_to_mark(:forbid_if, false), do: "↓"
-  defp step_to_mark(:forbid_if, _), do: "✗"
+  defp step_to_mark(:forbid_if, true), do: Symbols.x_mark()
+  defp step_to_mark(:forbid_if, false), do: Symbols.defer_mark()
+  defp step_to_mark(:forbid_if, _), do: Symbols.x_mark()
 
-  defp step_to_mark(:authorize_unless, true), do: "↓"
-  defp step_to_mark(:authorize_unless, false), do: "✓"
-  defp step_to_mark(:authorize_unless, _), do: "↓"
+  defp step_to_mark(:authorize_unless, true), do: Symbols.defer_mark()
+  defp step_to_mark(:authorize_unless, false), do: Symbols.check_mark()
+  defp step_to_mark(:authorize_unless, _), do: Symbols.defer_mark()
 
-  defp step_to_mark(:forbid_unless, true), do: "↓"
-  defp step_to_mark(:forbid_unless, false), do: "✗"
-  defp step_to_mark(:forbid_unless, _), do: "✗"
+  defp step_to_mark(:forbid_unless, true), do: Symbols.defer_mark()
+  defp step_to_mark(:forbid_unless, false), do: Symbols.x_mark()
+  defp step_to_mark(:forbid_unless, _), do: Symbols.x_mark()
+
+  defp status_to_mark(true), do: Symbols.check_mark()
+  defp status_to_mark(false), do: Symbols.x_mark()
+  defp status_to_mark(:unknowable), do: Symbols.question_mark()
+  defp status_to_mark(:irrelevant), do: Symbols.stop_mark()
+  defp status_to_mark(nil), do: Symbols.dash_mark()
 end
