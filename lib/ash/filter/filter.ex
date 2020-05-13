@@ -656,7 +656,7 @@ defmodule Ash.Filter do
       %{filter | ands: [addition | filter.ands]}
     end
     |> lift_impossibility()
-    |> lift_if_empty()
+    # |> lift_if_empty()
     |> add_not_filter_info()
   end
 
@@ -687,16 +687,16 @@ defmodule Ash.Filter do
 
           key == :or ->
             if Keyword.keyword?(value) do
-              %{filter | ors: [parse(filter.resource, value, filter.api) | filter.ors]}
+              %{filter | ands: [parse(filter.resource, value, filter.api) | filter.ands]}
             else
-              [first_or | rest_ors] = Enum.map(value, &parse(filter.resource, &1, filter.api))
+              empty_filter = parse(filter.resource, [], filter.api)
 
-              or_filter =
-                filter.resource
-                |> parse(first_or, filter.api)
-                |> Map.update!(:ors, &Kernel.++(&1, rest_ors))
+              filter_with_ors = %{
+                empty_filter
+                | ors: Enum.map(value, &parse(filter.resource, &1, filter.api))
+              }
 
-              %{filter | ands: [or_filter | filter.ands]}
+              %{filter | ands: [filter_with_ors | filter.ands]}
             end
 
           key == :not ->
@@ -724,43 +724,46 @@ defmodule Ash.Filter do
         end
     end)
     |> lift_impossibility()
-    |> lift_if_empty()
+    # |> lift_if_empty()
     |> add_not_filter_info()
   end
 
-  defp lift_if_empty(%{
-         ors: [],
-         ands: [and_filter | rest],
-         attributes: attrs,
-         relationships: rels,
-         not: nil,
-         errors: errors
-       })
-       when attrs == %{} and rels == %{} do
-    and_filter
-    |> Map.update!(:ands, &Kernel.++(&1, rest))
-    |> lift_if_empty()
-    |> Map.update!(:errors, &Kernel.++(&1, errors))
-  end
+  # This doesn't actually work. We should let the statement be artbitrarily nested
+  # at least for now. The inspect logic and expression logic should just be adjusted
+  # to deal with that.
+  # defp lift_if_empty(%{
+  #        ors: [],
+  #        ands: [and_filter | rest],
+  #        attributes: attrs,
+  #        relationships: rels,
+  #        not: nil,
+  #        errors: errors
+  #      })
+  #      when attrs == %{} and rels == %{} do
+  #   and_filter
+  #   |> Map.update!(:ands, &Kernel.++(&1, rest))
+  #   |> lift_if_empty()
+  #   |> Map.update!(:errors, &Kernel.++(&1, errors))
+  # end
 
-  defp lift_if_empty(%{
-         ands: [],
-         ors: [or_filter | rest],
-         attributes: attrs,
-         relationships: rels,
-         not: nil,
-         errors: errors
-       })
-       when attrs == %{} and rels == %{} do
-    or_filter
-    |> Map.update!(:ors, &Kernel.++(&1, rest))
-    |> lift_if_empty()
-    |> Map.update!(:errors, &Kernel.++(&1, errors))
-  end
+  # defp lift_if_empty(%{
+  #        ands: [],
+  #        ors: [or_filter | rest],
+  #        attributes: attrs,
+  #        relationships: rels,
+  #        not: nil,
+  #        errors: errors
+  #      })
+  #      when attrs == %{} and rels == %{} do
+  #   or_filter
+  #   |> Map.update!(:ors, &Kernel.++(&1, rest))
+  #   |> lift_if_empty()
+  #   |> Map.update!(:errors, &Kernel.++(&1, errors))
+  # end
 
-  defp lift_if_empty(filter) do
-    filter
-  end
+  # defp lift_if_empty(filter) do
+  #   filter
+  # end
 
   defp add_attribute_filter(filter, attr, value) do
     if Keyword.keyword?(value) do

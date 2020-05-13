@@ -57,8 +57,14 @@ defmodule Ash.Authorization.SatSolver do
   defp negate(nil), do: nil
   defp negate(expr), do: {:not, expr}
 
-  defp filter_to_expr(nil), do: nil
+  defp filter_to_expr(nil), do: true
   defp filter_to_expr(%{impossible?: true}), do: false
+
+  defp filter_to_expr(%{
+         attributes: %{attributes: attrs, relationships: rels, not: nil, ors: [], ands: []}
+       })
+       when attrs == %{} and rels == %{},
+       do: true
 
   defp filter_to_expr(%{
          attributes: attributes,
@@ -89,9 +95,16 @@ defmodule Ash.Authorization.SatSolver do
         join_expr(filter_to_expr(or_filter), expr, :or)
       end)
 
-    Enum.reduce(ands, expr, fn and_filter, expr ->
-      join_expr(filter_to_expr(and_filter), expr, :and)
-    end)
+    expr =
+      Enum.reduce(ands, expr, fn and_filter, expr ->
+        join_expr(filter_to_expr(and_filter), expr, :and)
+      end)
+
+    if expr do
+      expr
+    else
+      false
+    end
   end
 
   defp statement_to_expr(%Ash.Filter.NotIn{values: values}) do

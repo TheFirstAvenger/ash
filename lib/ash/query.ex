@@ -218,7 +218,10 @@ defmodule Ash.Query do
   def filter(query, statement) do
     filter =
       if query.filter do
-        Ash.Filter.add_to_filter(query.filter, statement)
+        Ash.Filter.add_to_filter(
+          query.filter,
+          Ash.Filter.parse(query.resource, statement, query.api)
+        )
       else
         Ash.Filter.parse(query.resource, statement, query.api)
       end
