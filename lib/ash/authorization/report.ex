@@ -174,7 +174,6 @@ defmodule Ash.Authorization.Report do
                   nil
               end
 
-            status_mark = status_to_mark(status)
             step_mark = step_to_mark(step, status)
 
             mod = clause.check_module
@@ -183,13 +182,13 @@ defmodule Ash.Authorization.Report do
 
             if relationship == [] do
               step_mark <>
-                " | " <> to_string(step) <> ": " <> mod.describe(opts) <> " " <> status_mark
+                " | " <> to_string(step) <> ": " <> pretty_print_clause_result(mod.describe(opts), status)
             else
               step_mark <>
                 " | " <>
                 to_string(step) <>
                 ": #{Enum.join(relationship || [], ".")}: " <>
-                mod.describe(opts) <> " " <> status_mark
+                pretty_print_clause_result(mod.describe(opts), status)
             end
           end)
           |> Enum.join("\n")
@@ -219,12 +218,6 @@ defmodule Ash.Authorization.Report do
   defp step_to_mark(:forbid_unless, true), do: Symbols.defer_mark()
   defp step_to_mark(:forbid_unless, false), do: Symbols.x_mark()
   defp step_to_mark(:forbid_unless, _), do: Symbols.x_mark()
-
-  defp status_to_mark(true), do: Symbols.check_mark()
-  defp status_to_mark(false), do: Symbols.x_mark()
-  defp status_to_mark(:unknowable), do: Symbols.question_mark()
-  defp status_to_mark(:irrelevant), do: Symbols.stop_mark()
-  defp status_to_mark(nil), do: Symbols.dash_mark()
 
   defp pretty_print_clause_result(text, true), do: Symbols.code(10, text)
   defp pretty_print_clause_result(text, false), do: Symbols.code(9, text)
