@@ -1,22 +1,41 @@
 defmodule Ash.Filter.Rules do
-  @rules [:subset]
+  # @rules [:subset]
 
   def subset(
         engine,
-        {:actual_attribute_is, attribute, x},
-        {:filter_attribute_equals, attribute, x}
+        {:attribute_equals, {name, value}},
+        {:attribute_equals, {name, value}}
       ) do
-    :seresye.assert(engine, {:filter_subset, attribute})
+    :seresye.assert(engine, {:attribute_equals, {name, value}})
   end
+
+  # def subset(
+  #       engine,
+  #       {:attribute_equals, {name, _}},
+  #       {:attribute_equals, {name, _}}
+  #     ) do
+  #   :seresye.assert(engine, {:attribute_equals, {name, value}})
+  # end
+
+  def subset(
+        engine,
+        {:filter, {ands, ors, not_filter, attributes, relationships}},
+        {:attribute_equals, {:name, "Zach"}}
+      ) do
+    # :seresye.assert(engine, :attribute_equals {:filter, })
+  end
+
 
   def start() do
     :seresye.start(:rules)
     :seresye.add_rules(:rules, __MODULE__)
 
     :seresye.assert(:rules, [
-      {:actual_attribute_is, :name, "zach"},
-      {:filter_attribute_equals, :name, "zach"}
+      {:filter, {ands, ors, not_filter, attributes, relationships}},
+      {:candidate_filter, {candidate_ands, candidate_ors, candidate_not, candidate_attributes, candidate_relationships}}
     ])
+
+    :seresye.query_kb(:rules, )
   end
 
   # start () ->
