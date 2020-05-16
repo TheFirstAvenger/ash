@@ -51,7 +51,8 @@ defmodule Ash.MixProject do
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:ashton, "~> 0.4.1"},
       {:picosat_elixir, "~> 0.1.1"},
-      {:machinery, "~> 1.0.0"}
+      {:machinery, "~> 1.0.0"},
+      {:seresye, github: "afiniate/seresye"}
     ]
   end
 end
