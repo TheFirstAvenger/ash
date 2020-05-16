@@ -3,6 +3,8 @@ defmodule Ash.Authorization.Report do
   alias Ash.Engine.Request
   alias Ash.Inspect.Symbols
 
+  @terminal_steps [Symbols.check_mark(), Symbols.x_mark]
+
   defstruct [
     :scenarios,
     :requests,
@@ -180,15 +182,22 @@ defmodule Ash.Authorization.Report do
             opts = clause.check_opts
             relationship = clause.path
 
+            clause_result =
+              if step_mark in @terminal_steps do
+                pretty_print_clause_result(mod.describe(opts), status)
+              else
+                mod.describe(opts)
+              end
+
             if relationship == [] do
               step_mark <>
-                " | " <> to_string(step) <> ": " <> pretty_print_clause_result(mod.describe(opts), status)
+                " | " <> to_string(step) <> ": " <> clause_result
             else
               step_mark <>
                 " | " <>
                 to_string(step) <>
                 ": #{Enum.join(relationship || [], ".")}: " <>
-                pretty_print_clause_result(mod.describe(opts), status)
+                clause_result
             end
           end)
           |> Enum.join("\n")
