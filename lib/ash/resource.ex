@@ -61,15 +61,16 @@ defmodule Ash.Resource do
       use Supervisor
 
       def start_link(args) do
-        Supervisor.start_link(__MODULE__, args, name: __MODULE__)
+        Supervisor.start_link(__MODULE__, args, name: Module.concat(args[:api], __MODULE__))
       end
 
-      def init(_init_arg) do
+      def init(args) do
         :persistent_term.put({__MODULE__, :data_layer}, @data_layer)
         :persistent_term.put({__MODULE__, :authorizers}, @authorizers)
         Extension.set_state(true)
+        children = [{Ash.Subscription.Monitor, resource: __MODULE__, api: args[:api]}]
 
-        Supervisor.init([], strategy: :one_for_one)
+        Supervisor.init(children, strategy: :one_for_one)
       end
 
       require Ash.Schema

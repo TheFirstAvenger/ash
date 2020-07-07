@@ -46,6 +46,31 @@ defmodule Ash.Api.Interface do
       end
 
       @impl true
+      # sobelow_skip ["SQL.Query"]
+      def subscribe!(resource, opts) when is_atom(resource) do
+        subscribe!(query(resource), opts)
+      end
+
+      def subscribe!(query, opts) do
+        Api.subscribe!(__MODULE__, query, opts)
+      end
+
+      @impl true
+      def subscribe(query, opts \\ [])
+
+      # sobelow_skip ["SQL.Query"]
+      def subscribe(resource, opts) when is_atom(resource) do
+        subscribe(query(resource), opts)
+      end
+
+      def subscribe(query, opts) do
+        case Api.subscribe(__MODULE__, query, opts) do
+          {:ok, subscription} -> {:ok, subscription}
+          {:error, error} -> {:error, List.wrap(error)}
+        end
+      end
+
+      @impl true
       def side_load!(data, query, opts \\ []) do
         Api.side_load!(__MODULE__, data, query, opts)
       end

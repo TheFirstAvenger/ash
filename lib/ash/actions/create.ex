@@ -55,6 +55,12 @@ defmodule Ash.Actions.Create do
              api,
              side_load_requests
            ) do
+      if opts[:upsert?] do
+        Ash.Subscription.Monitor.broadcast_event(api, resource, {:upsert, changeset, created})
+      else
+        Ash.Subscription.Monitor.broadcast_event(api, resource, {:create, created})
+      end
+
       {:ok, SideLoad.attach_side_loads(created, state)}
     else
       %Ecto.Changeset{} = changeset ->

@@ -50,6 +50,7 @@ defmodule Ash.Actions.Update do
              api,
              side_load_requests
            ) do
+      Ash.Subscription.Monitor.broadcast_event(api, resource, {:update, changeset, updated})
       {:ok, SideLoad.attach_side_loads(updated, state)}
     else
       %Ecto.Changeset{} = changeset ->

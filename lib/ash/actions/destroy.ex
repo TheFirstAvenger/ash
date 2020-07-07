@@ -46,6 +46,7 @@ defmodule Ash.Actions.Destroy do
 
     case Engine.run([authorization_request, destroy_request], api, engine_opts) do
       %{errors: []} ->
+        Ash.Subscription.Monitor.broadcast_event(api, resource, {:destroy, record})
         :ok
 
       {:error, errors} ->
